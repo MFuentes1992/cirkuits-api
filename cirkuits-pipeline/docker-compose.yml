@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  pg_engine:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=nico
+      - POSTGRES_PASSWORD=Server123
+    links:
+      - pgAdmin
+  pgAdmin:
+    image: dpage/pgadmin4
+    ports:
+      - "5433:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=cirkuits@cirkuitstudios.com
+      - PGADMIN_DEFAULT_PASSWORD=Admin123

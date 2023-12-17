@@ -1,0 +1,100 @@
+<mxfile host="app.diagrams.net" modified="2023-12-05T04:21:49.188Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:120.0) Gecko/20100101 Firefox/120.0" etag="oGSnQtYxrv3XKSUNb48j" version="22.1.5" type="device">
+  <diagram name="Página-1" id="ItrQrOa_jWo2uyEdTi_7">
+    <mxGraphModel dx="1103" dy="719" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-1" value="tbl_Users" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="140" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-7" value="" style="endArrow=none;dashed=1;html=1;rounded=0;entryX=0.007;entryY=0.231;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="kyReBLGNhrg-AsLVHlHX-1" target="kyReBLGNhrg-AsLVHlHX-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-30" y="77" as="sourcePoint" />
+            <mxPoint x="20" y="30" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-2" value="&lt;div&gt;UserID&lt;/div&gt;&lt;div&gt;FullName&lt;br&gt;&lt;/div&gt;&lt;div&gt;UserName&lt;/div&gt;&lt;div&gt;Email&lt;/div&gt;&lt;div&gt;Mobile&lt;/div&gt;&lt;div&gt;Password&lt;/div&gt;&lt;div&gt;Active&lt;br&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;" vertex="1" parent="kyReBLGNhrg-AsLVHlHX-1">
+          <mxGeometry y="40" width="140" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-3" value="tbl_UserAddress" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="300" width="140" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-4" value="&lt;div&gt;AddressID&lt;/div&gt;&lt;div&gt;Street&lt;/div&gt;&lt;div&gt;City&lt;/div&gt;&lt;div&gt;Country&lt;/div&gt;&lt;div&gt;State_Providence&lt;/div&gt;&lt;div&gt;PostalCode&lt;/div&gt;&lt;div&gt;UserID&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;" vertex="1" parent="kyReBLGNhrg-AsLVHlHX-3">
+          <mxGeometry y="40" width="140" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-5" value="" style="endArrow=none;dashed=1;html=1;rounded=0;" edge="1" parent="kyReBLGNhrg-AsLVHlHX-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint y="150" as="sourcePoint" />
+            <mxPoint x="-30" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-6" value="" style="endArrow=none;dashed=1;html=1;rounded=0;" edge="1" parent="kyReBLGNhrg-AsLVHlHX-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-30" y="150" as="sourcePoint" />
+            <mxPoint x="-30" y="-180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-8" value="tbl_Subscription" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="240" y="40" width="140" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-9" value="&lt;div&gt;SubID&lt;/div&gt;&lt;div&gt;StartDate&lt;/div&gt;&lt;div&gt;EndDate&lt;/div&gt;&lt;div&gt;Active&lt;/div&gt;&lt;div&gt;UserID&lt;br&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;" vertex="1" parent="kyReBLGNhrg-AsLVHlHX-8">
+          <mxGeometry y="40" width="140" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-10" value="" style="endArrow=none;dashed=1;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="180" y="120" as="sourcePoint" />
+            <mxPoint x="210" y="120" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-11" value="" style="endArrow=none;dashed=1;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="210" y="160" as="sourcePoint" />
+            <mxPoint x="210" y="120" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-12" value="" style="endArrow=none;dashed=1;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="210" y="160" as="sourcePoint" />
+            <mxPoint x="250" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-13" value="tbl_PaymentMethod" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="260" y="210" width="140" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-14" value="&lt;div&gt;PaymentID&lt;/div&gt;&lt;div&gt;CardHolderName&lt;/div&gt;&lt;div&gt;CardHolderLastName&lt;/div&gt;&lt;div&gt;CardNumber&lt;/div&gt;&lt;div&gt;CVV&lt;/div&gt;&lt;div&gt;ExpYear&lt;/div&gt;&lt;div&gt;ExpMonth&lt;/div&gt;&lt;div&gt;UserID&lt;/div&gt;&lt;div&gt;AddressID&lt;br&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;" vertex="1" parent="kyReBLGNhrg-AsLVHlHX-13">
+          <mxGeometry y="40" width="140" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-19" value="" style="endArrow=none;dashed=1;html=1;rounded=0;entryX=0.014;entryY=0.838;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="kyReBLGNhrg-AsLVHlHX-13" target="kyReBLGNhrg-AsLVHlHX-14">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-40" y="150" as="sourcePoint" />
+            <mxPoint x="10" y="100" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-15" value="" style="endArrow=none;dashed=1;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="180" y="360" as="sourcePoint" />
+            <mxPoint x="220" y="360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-17" value="" style="endArrow=none;dashed=1;html=1;rounded=0;entryX=0.079;entryY=0.992;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" target="kyReBLGNhrg-AsLVHlHX-14">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="220" y="380" as="sourcePoint" />
+            <mxPoint x="270" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-18" value="" style="endArrow=none;dashed=1;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="210" y="360" as="sourcePoint" />
+            <mxPoint x="210" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kyReBLGNhrg-AsLVHlHX-16" value="" style="endArrow=none;dashed=1;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="210" y="360" as="sourcePoint" />
+            <mxPoint x="210" y="380" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
