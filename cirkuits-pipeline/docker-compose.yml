@@ -21,7 +21,7 @@ services:
     ports:
       - "80:80"
     environment:
-      - CIRKUITS_API_DB=jdbc:postgresql://8.118.23.50:5432/cirkuits_open
+      - CIRKUITS_API_DB=jdbc:postgresql://18.118.23.50:5432/cirkuits_open
       - CIRKUITS_API_PORT=80
     depends_on:
       - pg_engine
