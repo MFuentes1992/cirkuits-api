@@ -1,5 +1,7 @@
 package com.cirkuits.cirkuitsapi.user;
 
+import com.cirkuits.cirkuitsapi.EmailService.EmailService;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,10 +16,12 @@ import java.util.UUID;
 public class UserService {
     private final UsersRepository userRepo;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService mailService;
     @Autowired
-    public UserService(UsersRepository _userRepo) {
+    public UserService(UsersRepository _userRepo, EmailService mailService) {
         this.userRepo = _userRepo;
         this.passwordEncoder = new BCryptPasswordEncoder();
+        this.mailService = mailService;
     }
     public Users getUserEmail(String email) {
         return userRepo.findByEmail(email);
@@ -38,6 +42,11 @@ public class UserService {
         String encodedPass = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPass);
         Users addedUser = userRepo.save(user);
+        try {
+            mailService.sendEmail("services@mail.prod.cirkuits.com", user.getEmail(), "Verify Email", "verifyEmail.com");
+        } catch (MessagingException e) {
+            throw new RuntimeException(e.getMessage());
+        }
         return addedUser;
     }
 }
