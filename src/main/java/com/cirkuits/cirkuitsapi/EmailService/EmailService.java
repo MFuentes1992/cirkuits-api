@@ -6,12 +6,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import static org.antlr.v4.runtime.misc.Utils.readFile;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Service
 public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
+
+    String readFile(String Filepath) throws IOException {
+        Path file = Paths.get(Filepath);
+        return Files.readString(file, StandardCharsets.UTF_8);
+    }
 
     public void sendEmail(String sender, String emailDest, String subject, String templateName) throws MessagingException {
 
@@ -22,7 +31,7 @@ public class EmailService {
         String htmlTemplate = "";
         try {
             // Read the HTML template into a String variable
-             htmlTemplate = readFile("templates/"+templateName+".html").toString();
+             htmlTemplate = readFile("src/main/resources/templates/"+templateName+".html");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -31,8 +40,9 @@ public class EmailService {
         // htmlTemplate = htmlTemplate.replace("${message}", "Hello, this is a test email.");
 
         // Set the email's content to be the HTML template
+        System.out.println(htmlTemplate);
         message.setContent(htmlTemplate, "text/html; charset=utf-8");
-        if(htmlTemplate.isBlank())
+        if(htmlTemplate.isEmpty())
             throw new MessagingException("Template cannot be null");
         mailSender.send(message);
     }

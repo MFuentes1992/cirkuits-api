@@ -41,12 +41,11 @@ public class UserService {
         }
         String encodedPass = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPass);
-        Users addedUser = userRepo.save(user);
         try {
-            mailService.sendEmail("services@mail.prod.cirkuits.com", user.getEmail(), "Verify Email", "verifyEmail.com");
+            mailService.sendEmail("services@mail.prod.cirkuits.com", user.getEmail(), "Verify Email", "verifyEmail");
         } catch (MessagingException e) {
             throw new RuntimeException(e.getMessage());
         }
-        return addedUser;
+        return userRepo.save(user);
     }
 }
