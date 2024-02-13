@@ -60,42 +60,53 @@
         .title {
             font-size: 1.5rem;
             margin-bottom: 10px;
+            text-align: center;
         }
         .text {
             color: #6c6c6cc2;
             font-size: 1rem;
             margin-bottom: 10px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="logo-container">
-        <img src="../../src/images/LogoGris.png" alt="Logo" class="logo" />
-    </div>
-    <p class="title">Verify your email address</p>
-    <div class="textContainer">
-        <p class="text">
-            Thanks for signing up with us. Click the button below to verify your
-            email address.
-        </p>
-    </div>
-
-    <form>
-        <button type="submit" id="verify">Verify your email</button>
-    </form>
-    <div class="textContainer">
-        <p class="text">
-            If the email wasn’t intended for you feel free to delete it.
-        </p>
-    </div>
-</div>
-<script type="application/javascript">
-    const verifyBtn = document.getElementById("verify");
-    verifyBtn.addEventListener("click", (evt) => {
-        evt.preventDefault();
-        alert("Verifying...");
-    });
-</script>
+<form action="http://localhost:8082/api/v1/verify" method="post">
+    <!-- <form action="http://prod.cirkuits.com/api/v1/verify" method="post"> -->
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <div class="logo-container">
+                <img src="cid:{cid}" alt="Logo" class="logo" />
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p class="title">Verify your email address</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p class="text">
+                Thanks for signing up with us. Click the button below to verify your
+                email address.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align: center"><button type="submit" id="verify">Verify your email</button></td>
+    </tr>
+    <tr>
+        <td>
+            <p class="text">
+                If the email wasn’t intended for you feel free to delete it.
+            </p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</form>
 </body>
 </html>
