@@ -48,4 +48,11 @@ public class UserService {
         }
         return userRepo.save(user);
     }
+
+    public Users verifyUser(String email, boolean active) {
+        Users user = userRepo.findByEmail(email);
+        user.setActive(active);
+        return userRepo.save(user);
+    }
+
 }
