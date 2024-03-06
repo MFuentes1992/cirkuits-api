@@ -1,5 +1,8 @@
 package com.cirkuits.cirkuitsapi.user;
 
+import com.cirkuits.cirkuitsapi.EmailService.EmailService;
+import com.cirkuits.cirkuitsapi.Verify.VerifyResponseV1;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,10 +17,12 @@ import java.util.UUID;
 public class UserService {
     private final UsersRepository userRepo;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService mailService;
     @Autowired
-    public UserService(UsersRepository _userRepo) {
+    public UserService(UsersRepository _userRepo, EmailService mailService) {
         this.userRepo = _userRepo;
         this.passwordEncoder = new BCryptPasswordEncoder();
+        this.mailService = mailService;
     }
     public Users getUserEmail(String email) {
         return userRepo.findByEmail(email);
@@ -37,7 +42,32 @@ public class UserService {
         }
         String encodedPass = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPass);
-        Users addedUser = userRepo.save(user);
-        return addedUser;
+        try {
+            mailService.sendEmail("services@mail.prod.cirkuits.com", user.getEmail(), "Verify Email", "verifyEmail");
+        } catch (MessagingException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        return userRepo.save(user);
     }
+
+    public VerifyResponseV1 verifyUser(String email, boolean active) {
+        VerifyResponseV1 response = new VerifyResponseV1(0, "");
+        Users user = userRepo.findByEmail(email);
+        if(user == null) {
+            response.setCode(500);
+            response.setMessage("Something went wrong");
+            return response;
+        }
+        if(user.isActive()) {
+            response.setCode(500);
+            response.setMessage("User is already activated.");
+            return response;
+        };
+        user.setActive(active);
+        userRepo.save(user);
+        response.setCode(200);
+        response.setMessage("User has been activated successfully");
+        return response;
+    }
+
 }
