@@ -1,6 +1,7 @@
 package com.cirkuits.cirkuitsapi.user;
 
 import com.cirkuits.cirkuitsapi.Verify.Verify;
+import com.cirkuits.cirkuitsapi.Verify.VerifyResponseV1;
 import com.cirkuits.cirkuitsapi.login.Login;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,22 +51,13 @@ public class UserController {
         return ResponseEntity.ok().body("User created successfully");
     }
 
+    @CrossOrigin(origins = "https://static-res-0.s3.us-east-2.amazonaws.com")
     @PutMapping(path = "api/v1/verify")
-    public ResponseEntity<Object> postVerify(@RequestBody Verify payload) {
-        Map<String, String> jsonResponse = new HashMap<>();
-        if(payload == null) {
-            jsonResponse.put("code", "400");
-            jsonResponse.put("message", "Payload is empty");
-            return new ResponseEntity<>(jsonResponse, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Object> putVerify(@RequestBody Verify payload) {
+        VerifyResponseV1 res = userService.verifyUser(payload.getEmail(), payload.isActive());
+        if(res.getCode() == 200) {
+            return ResponseEntity.ok().body(res);
         }
-        Users res = userService.verifyUser(payload.getEmail(), payload.isActive());
-        if(res == null) {
-            jsonResponse.put("code", "500");
-            jsonResponse.put("message", "Cannot perform operation.");
-            return new ResponseEntity<>(jsonResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        jsonResponse.put("code", "200");
-        jsonResponse.put("message", "User verified successfully.");
-        return new ResponseEntity<>(jsonResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.internalServerError().body(res);
     }
 }

@@ -1,6 +1,7 @@
 package com.cirkuits.cirkuitsapi.user;
 
 import com.cirkuits.cirkuitsapi.EmailService.EmailService;
+import com.cirkuits.cirkuitsapi.Verify.VerifyResponseV1;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -49,10 +50,24 @@ public class UserService {
         return userRepo.save(user);
     }
 
-    public Users verifyUser(String email, boolean active) {
+    public VerifyResponseV1 verifyUser(String email, boolean active) {
+        VerifyResponseV1 response = new VerifyResponseV1(0, "");
         Users user = userRepo.findByEmail(email);
+        if(user == null) {
+            response.setCode(500);
+            response.setMessage("Something went wrong");
+            return response;
+        }
+        if(user.isActive()) {
+            response.setCode(500);
+            response.setMessage("User is already activated.");
+            return response;
+        };
         user.setActive(active);
-        return userRepo.save(user);
+        userRepo.save(user);
+        response.setCode(200);
+        response.setMessage("User has been activated successfully");
+        return response;
     }
 
 }

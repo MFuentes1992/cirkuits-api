@@ -47,7 +47,8 @@ public class EmailService {
             // --
             MimeBodyPart htmlPart = new MimeBodyPart();
             String cleanTemplate = htmlTemplate.replace("{cid}", cid);
-            htmlPart.setContent(cleanTemplate, "text/html; charset=utf-8");
+            String appendEmail = cleanTemplate.replace("{email}", emailDest);
+            htmlPart.setContent(appendEmail, "text/html; charset=utf-8");
 
             // -- Compile into the multypart
             multipart.addBodyPart(htmlPart);
