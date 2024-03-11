@@ -1,13 +1,25 @@
 package com.cirkuits.cirkuitsapi.user;
 
+import com.auth0.jwk.Jwk;
+import com.auth0.jwk.JwkException;
+import com.auth0.jwk.JwkProvider;
+import com.auth0.jwk.UrlJwkProvider;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.cirkuits.cirkuitsapi.Auth.AuthService;
 import com.cirkuits.cirkuitsapi.Verify.Verify;
 import com.cirkuits.cirkuitsapi.Verify.VerifyResponseV1;
 import com.cirkuits.cirkuitsapi.login.Login;
+import com.cirkuits.cirkuitsapi.user.model.UserErrorResponseV1;
+import com.cirkuits.cirkuitsapi.user.model.UserResponseV1;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.interfaces.RSAPublicKey;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -33,6 +45,9 @@ public class UserController {
     public ResponseEntity<String> loginForm(@RequestBody Login login) {
         Users user = userService.getLoginEmail(login.getEmail(), login.getPassword());
         if(user != null) {
+            //TODO: Return User response object
+            //TODO: Validate JWT. - the new process will be. Auth0 credentials will get the token and then App will query the user credentials to get the user info.
+
             return ResponseEntity.ok().body("Login sucess");
         } else {
             return ResponseEntity.internalServerError().body("User not found");
@@ -59,5 +74,19 @@ public class UserController {
             return ResponseEntity.ok().body(res);
         }
         return ResponseEntity.internalServerError().body(res);
+    }
+
+    @PutMapping(path = "api/v1/edit")
+    public ResponseEntity<Object> updateUserInfo(@RequestHeader("Authorization") String bearerToken, @RequestBody Users user) throws JwkException{
+        String token = bearerToken.substring(7);
+        AuthService authService = new AuthService(token);
+        if(authService.isValidToken() && authService.isTokenExpired()) throw new JwkException("Token is invalid or expired");
+        UserResponseV1 userResponse = userService.updateUser(user);
+        if(userResponse != null) {
+            return ResponseEntity.ok().body(userResponse);
+        } else {
+            UserErrorResponseV1 error = new UserErrorResponseV1(500, "User not found");
+            return ResponseEntity.internalServerError().body(error);
+        }
     }
 }
