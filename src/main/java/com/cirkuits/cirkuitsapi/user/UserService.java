@@ -72,13 +72,12 @@ public class UserService {
     }
 
     public UserResponseV1 updateUser(Users user) {
-        Users existingUser = userRepo.findByEmail(user.getEmail());
+        Users existingUser = userRepo.findById(user.getUserID()).orElse(null);
         if(existingUser == null) {
             return null;
         }
         Users saved = userRepo.save(user);
-        UserResponseV1 response = new UserResponseV1(saved.getFullName(), saved.getUserName(), saved.getEmail(), saved.getMobile(), saved.isActive());
-        return response;
+        return new UserResponseV1(saved.getFullName(), saved.getUserName(), saved.getEmail(), saved.getMobile(), saved.isActive());
     }
 
 }

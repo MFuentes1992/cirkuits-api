@@ -7,22 +7,24 @@ import com.auth0.jwk.UrlJwkProvider;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.security.interfaces.RSAPublicKey;
 
 public class AuthService {
     private DecodedJWT jwt;
+
     private JwkProvider provider;
 
     private Algorithm algorithm;
+
     private Jwk jwk;
-    @Value("${cirkuits.auth0.jwks.uri}")
-    private String jwkUri;
-    public AuthService(String token) throws JwkException {
+
+
+    public AuthService(String token, String jwkUri) throws JwkException {
         jwt = JWT.decode(token);
         provider = new UrlJwkProvider(jwkUri);
     }
+
     public boolean isValidToken() throws  JwkException {
         jwk = provider.get(jwt.getKeyId());
         algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
@@ -31,6 +33,7 @@ public class AuthService {
     }
 
     public boolean isTokenExpired() {
-        return jwt.getExpiresAt().after(new java.util.Date());
+        System.out.printf("Token expires at: %s\n", jwt.getExpiresAt());
+        return jwt.getExpiresAt().before(new java.util.Date());
     }
 }
