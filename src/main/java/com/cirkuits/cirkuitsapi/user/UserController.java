@@ -48,7 +48,7 @@ public class UserController {
     }
 
     @PostMapping(path = "api/v1/register")
-    public ResponseEntity<String> postUser(@RequestBody Users user) {
+    public ResponseEntity<String> postUser(@RequestBody Users user) throws RuntimeException {
         if(user == null) {
             return ResponseEntity.internalServerError().body("User is empty");
         }
