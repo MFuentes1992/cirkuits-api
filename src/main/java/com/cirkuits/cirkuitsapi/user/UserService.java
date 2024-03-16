@@ -45,6 +45,7 @@ public class UserService {
         try {
             mailService.sendEmail("services@mail.prod.cirkuits.com", user.getEmail(), "Verify Email", "verifyEmail");
         } catch (MessagingException e) {
+            System.out.println("main error"+e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
         return userRepo.save(user);
