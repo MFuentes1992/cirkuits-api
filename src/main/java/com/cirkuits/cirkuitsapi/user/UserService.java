@@ -77,7 +77,8 @@ public class UserService {
             return null;
         }
         Users saved = userRepo.save(user);
-        return new UserResponseV1(saved.getFullName(), saved.getUserName(), saved.getEmail(), saved.getMobile(), saved.isActive());
+        return new UserResponseV1(saved.getUserID().toString(), saved.getFullName(), saved.getUserName(),
+                                        saved.getEmail(), saved.getMobile(), saved.isActive());
     }
 
 }

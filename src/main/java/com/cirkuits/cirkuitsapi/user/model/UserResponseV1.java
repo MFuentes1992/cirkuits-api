@@ -1,6 +1,7 @@
 package com.cirkuits.cirkuitsapi.user.model;
 
 public class UserResponseV1 {
+    private String UserID;
     private String fullName;
     private String userName;
     private String email;
@@ -10,12 +11,21 @@ public class UserResponseV1 {
     public UserResponseV1() {
     }
 
-    public UserResponseV1(String fullName, String userName, String email, String mobile, boolean active) {
+    public UserResponseV1(String userID, String fullName, String userName, String email, String mobile, boolean active) {
+        this.UserID = userID;
         this.fullName = fullName;
         this.userName = userName;
         this.email = email;
         this.mobile = mobile;
         this.active = active;
+    }
+
+    public String getUserID() {
+        return UserID;
+    }
+
+    public void setUserID(String userID) {
+        UserID = userID;
     }
 
     public String getFullName() {

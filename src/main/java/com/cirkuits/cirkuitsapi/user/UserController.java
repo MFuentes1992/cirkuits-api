@@ -34,15 +34,16 @@ public class UserController {
     }
 
     @PostMapping(path = "api/v1/login")
-    public ResponseEntity<String> loginForm(@RequestBody Login login) {
+    public ResponseEntity<Object> loginForm(@RequestBody Login login) {
         Users user = userService.getLoginEmail(login.getEmail(), login.getPassword());
         if(user != null) {
             //TODO: Return User response object
             //TODO: Validate JWT. - the new process will be. Auth0 credentials will get the token and then App will query the user credentials to get the user info.
-
-            return ResponseEntity.ok().body("Login sucess");
+            UserResponseV1 userResponse = new UserResponseV1(user.getUserID().toString(),  user.getFullName(), user.getUserName(), user.getEmail(), user.getMobile(), user.isActive());
+            return ResponseEntity.ok().body(userResponse);
         } else {
-            return ResponseEntity.internalServerError().body("User not found");
+            UserErrorResponseV1 error = new UserErrorResponseV1(500, "User not found");
+            return ResponseEntity.internalServerError().body(error);
         }
     }
 

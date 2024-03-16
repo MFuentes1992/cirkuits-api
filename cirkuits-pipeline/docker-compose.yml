@@ -7,8 +7,10 @@ services:
     environment:
       - POSTGRES_USER=nico
       - POSTGRES_PASSWORD=Server123
+    volumes:
+    - .pg_data:/var/lib/postgresql/data
     links:
-      - pgAdmin
+      - pgAdmin      
   pgAdmin:
     image: dpage/pgadmin4
     ports:
