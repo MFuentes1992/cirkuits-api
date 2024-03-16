@@ -2,6 +2,7 @@ package com.cirkuits.cirkuitsapi.user;
 
 import com.cirkuits.cirkuitsapi.EmailService.EmailService;
 import com.cirkuits.cirkuitsapi.Verify.VerifyResponseV1;
+import com.cirkuits.cirkuitsapi.user.model.UserResponseV1;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -68,6 +69,16 @@ public class UserService {
         response.setCode(200);
         response.setMessage("User has been activated successfully");
         return response;
+    }
+
+    public UserResponseV1 updateUser(Users user) {
+        Users existingUser = userRepo.findById(user.getUserID()).orElse(null);
+        if(existingUser == null) {
+            return null;
+        }
+        Users saved = userRepo.save(user);
+        return new UserResponseV1(saved.getUserID().toString(), saved.getFullName(), saved.getUserName(),
+                                        saved.getEmail(), saved.getMobile(), saved.isActive());
     }
 
 }

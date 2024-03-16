@@ -58,6 +58,7 @@ public class EmailService {
         }
         // -- Add the multy part to the email message
         message.setContent(multipart);
+        System.out.println("Sending email:"+message.toString());
         mailSender.send(message);
     }
 }

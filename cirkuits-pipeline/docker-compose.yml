@@ -7,8 +7,10 @@ services:
     environment:
       - POSTGRES_USER=nico
       - POSTGRES_PASSWORD=Server123
+    volumes:
+    - .pg_data:/var/lib/postgresql/data
     links:
-      - pgAdmin
+      - pgAdmin      
   pgAdmin:
     image: dpage/pgadmin4
     ports:
@@ -23,5 +25,6 @@ services:
     environment:
       - CIRKUITS_API_DB=jdbc:postgresql://18.118.23.50:5432/cirkuits_open
       - CIRKUITS_API_PORT=80
+      - CIRKUITS_JWKS_URI=https://dev-lv2cgjrb5lwe78h2.us.auth0.com
     depends_on:
       - pg_engine
