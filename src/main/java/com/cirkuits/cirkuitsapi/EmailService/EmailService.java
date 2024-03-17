@@ -53,7 +53,8 @@ public class EmailService {
             // -- Compile into the multypart
             multipart.addBodyPart(htmlPart);
             multipart.addBodyPart(imagePart);
-        } catch (Exception e) {
+        } catch (IOException e) {
+            e.printStackTrace();
             System.out.println(e.getMessage());
         }
         // -- Add the multy part to the email message
