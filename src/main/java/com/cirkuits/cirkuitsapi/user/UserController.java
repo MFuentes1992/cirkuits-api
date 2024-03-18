@@ -25,21 +25,23 @@ public class UserController {
     }
 
     @GetMapping(path = "api/v1/users")
-    public ResponseEntity<Users> getUser(@RequestParam("email") String email) {
+    public ResponseEntity<Object> getUser(@RequestParam("email") String email) {
         Users user = userService.getUserEmail(email);
         if(user == null) {
-            return ResponseEntity.internalServerError().body(user);
+            UserErrorResponseV1 error = new UserErrorResponseV1(500, "User not found");
+            return ResponseEntity.internalServerError().body(error);
         }
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @PostMapping(path = "api/v1/login")
-    public ResponseEntity<Object> loginForm(@RequestBody Login login) {
+    public ResponseEntity<Object> loginForm(@RequestHeader("Authorization") String bearerToken, @RequestBody Login login) throws JwkException {
+        String token = bearerToken.substring(7);
+        AuthService authService = new AuthService(token, jwkUri);
+        if(!authService.isValidToken() || authService.isTokenExpired()) throw new JwkException("Token is invalid or expired");
         Users user = userService.getLoginEmail(login.getEmail(), login.getPassword());
         if(user != null) {
-            //TODO: Return User response object
-            //TODO: Validate JWT. - the new process will be. Auth0 credentials will get the token and then App will query the user credentials to get the user info.
-            UserResponseV1 userResponse = new UserResponseV1(user.getUserID().toString(),  user.getFullName(), user.getUserName(), user.getEmail(), user.getMobile(), user.isActive());
+            UserResponseV1 userResponse = new UserResponseV1(user.getUserID().toString(),  user.getFullName(), user.getUserName(), user.getEmail(), user.getMobile(), user.isActive(), user.getDob(), user.getGender());
             return ResponseEntity.ok().body(userResponse);
         } else {
             UserErrorResponseV1 error = new UserErrorResponseV1(500, "User not found");

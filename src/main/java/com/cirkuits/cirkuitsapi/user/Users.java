@@ -6,10 +6,11 @@ import org.hibernate.annotations.UuidGenerator;
 import java.util.UUID;
 
 @Entity
-@Table
+@Table(name = "tbl_User")
 public class Users {
     @Id
     @UuidGenerator
+    @Column(name = "userId")
     private UUID userID;
     private String fullName;
     private String userName;
@@ -17,6 +18,10 @@ public class Users {
     private String mobile;
     private String password;
     private boolean active;
+    @Column(name = "DOB")
+    private String dob;
+    @Column(name = "genderId")
+    private int gender;
 
     public Users() {
 
@@ -96,6 +101,22 @@ public class Users {
         this.active = active;
     }
 
+    public String getDob() {
+        return dob;
+    }
+
+    public void setDob(String dob) {
+        this.dob = dob;
+    }
+
+    public int getGender() {
+        return gender;
+    }
+
+    public void setGender(int gender) {
+        this.gender = gender;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -106,6 +127,8 @@ public class Users {
                 ", Mobile='" + mobile + '\'' +
                 ", Password='" + password + '\'' +
                 ", Active=" + active +
+                ", DOB='" + dob + '\'' +
+                "Gender" + gender + '\'' +
                 '}';
     }
 }
