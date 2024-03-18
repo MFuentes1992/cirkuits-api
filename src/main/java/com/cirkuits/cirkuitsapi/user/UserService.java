@@ -77,9 +77,11 @@ public class UserService {
         if(existingUser == null) {
             return null;
         }
+        user.setPassword(existingUser.getPassword());
+        user.setActive(existingUser.isActive());
         Users saved = userRepo.save(user);
         return new UserResponseV1(saved.getUserID().toString(), saved.getFullName(), saved.getUserName(),
-                                        saved.getEmail(), saved.getMobile(), saved.isActive());
+                                        saved.getEmail(), saved.getMobile(), saved.isActive(), saved.getDob(), saved.getGender());
     }
 
 }

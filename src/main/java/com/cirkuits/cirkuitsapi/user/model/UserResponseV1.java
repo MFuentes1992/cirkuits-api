@@ -1,5 +1,7 @@
 package com.cirkuits.cirkuitsapi.user.model;
 
+import jakarta.persistence.Column;
+
 public class UserResponseV1 {
     private String UserID;
     private String fullName;
@@ -7,17 +9,21 @@ public class UserResponseV1 {
     private String email;
     private String mobile;
     private boolean active;
+    private String dob;
+    private int gender;
 
     public UserResponseV1() {
     }
 
-    public UserResponseV1(String userID, String fullName, String userName, String email, String mobile, boolean active) {
+    public UserResponseV1(String userID, String fullName, String userName, String email, String mobile, boolean active, String dob, int gender) {
         this.UserID = userID;
         this.fullName = fullName;
         this.userName = userName;
         this.email = email;
         this.mobile = mobile;
         this.active = active;
+        this.dob = dob;
+        this.gender = gender;
     }
 
     public String getUserID() {
@@ -68,6 +74,22 @@ public class UserResponseV1 {
         this.active = active;
     }
 
+    public String getDob() {
+        return dob;
+    }
+
+    public void setDob(String dob) {
+        this.dob = dob;
+    }
+
+    public int getGender() {
+        return gender;
+    }
+
+    public void setGender(int gender) {
+        this.gender = gender;
+    }
+
     @Override
     public String toString() {
         return "UserResponseV1{" +
@@ -76,6 +98,8 @@ public class UserResponseV1 {
                 ", email='" + email + '\'' +
                 ", mobile='" + mobile + '\'' +
                 ", active=" + active +
+                ", dob='" + dob + '\'' +
+                ", gender='" + gender + '\'' +
                 '}';
     }
 }
