@@ -54,7 +54,7 @@ public class UserService {
 
     public VerifyResponseV1 verifyUser(String email, boolean active) {
         VerifyResponseV1 response = new VerifyResponseV1(0, "");
-        Users user = userRepo.findByEmail(email);
+        Users user = userRepo.findPendingUserByEmail(email);
         if(user == null) {
             response.setCode(500);
             response.setMessage("Something went wrong");
