@@ -24,9 +24,10 @@ public class StripeController {
     @PostMapping (path = "api/v1/stripe/payment-sheet")
     public ResponseEntity<Object> paymentSheet(@RequestBody PurchaseIntent pIntent) throws Exception {
         Stripe.apiKey = secretKey;
-        // -- If customer Id does not exist in DB, create a new customer
-        // -- Customer must have full name, email, and phone number
         Users user = userService.getUserEmail(pIntent.getEmail());
+        if(user == null) {
+            return ResponseEntity.badRequest().body("User not found");
+        }
         stripeService.Initialize(user, pIntent.getCurrency(), pIntent.getAmount(), pIntent.getLocale());
         return ResponseEntity.ok().body(stripeService.createPaymentIntent());
     }

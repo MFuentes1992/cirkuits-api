@@ -20,10 +20,15 @@ public class CustomerPurchaseService {
         customerPurchaseRepository.save(customerPurchase);
     }
 
+    public CustomerPurchase getCustomerPurchaseByAddressId(UUID addressId) {
+        return customerPurchaseRepository.findByAddressId(addressId);
+    }
+
     public CustomerPurchase getCustomerPurchase(UUID id) {
         return customerPurchaseRepository.findByUserId(id);
     }
 
-
-
+    public void updateCustomerPurchase(CustomerPurchase customerPurchase) {
+        customerPurchaseRepository.save(customerPurchase);
+    }
 }
