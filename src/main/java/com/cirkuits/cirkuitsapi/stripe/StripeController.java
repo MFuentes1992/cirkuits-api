@@ -17,6 +17,8 @@ import com.stripe.Stripe;
 public class StripeController {
     @Autowired
     UserService userService;
+    @Autowired
+    StripeService stripeService;
     @Value("${cirkuits.stripe.secret.key}")
     private String secretKey;
     @PostMapping (path = "api/v1/stripe/payment-sheet")
@@ -25,7 +27,7 @@ public class StripeController {
         // -- If customer Id does not exist in DB, create a new customer
         // -- Customer must have full name, email, and phone number
         Users user = userService.getUserEmail(pIntent.getEmail());
-        StripeService stripeService = new StripeService(user, pIntent.getCurrency(), pIntent.getAmount());
+        stripeService.Initialize(user, pIntent.getCurrency(), pIntent.getAmount(), pIntent.getLocale());
         return ResponseEntity.ok().body(stripeService.createPaymentIntent());
     }
 }

@@ -1,6 +1,11 @@
 package com.cirkuits.cirkuitsapi.stripe.service;
 
+import com.cirkuits.cirkuitsapi.address.model.CustomerAddress;
+import com.cirkuits.cirkuitsapi.address.service.CustomerAddressService;
+import com.cirkuits.cirkuitsapi.customerPurchase.model.CustomerPurchase;
+import com.cirkuits.cirkuitsapi.customerPurchase.service.CustomerPurchaseService;
 import com.cirkuits.cirkuitsapi.stripe.model.StripeResponse;
+import com.cirkuits.cirkuitsapi.user.UserService;
 import com.cirkuits.cirkuitsapi.user.Users;
 import com.stripe.model.Customer;
 import com.stripe.model.EphemeralKey;
@@ -8,25 +13,62 @@ import com.stripe.model.PaymentIntent;
 import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.EphemeralKeyCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class StripeService {
+    @Autowired
+    private final UserService userService;
+    @Autowired
+    private final CustomerPurchaseService customerPurchaseService;
+    @Autowired
+    private final CustomerAddressService customerAddressService;
     private Users user;
     private String currency;
     private Long amount;
 
-    public StripeService(Users user, String currency, Long amount) {
+    private String locale;
+
+    public StripeService(UserService userService, CustomerPurchaseService customerPurchaseService, CustomerAddressService customerAddressService) {
+        this.userService = userService;
+        this.customerPurchaseService = customerPurchaseService;
+        this.customerAddressService = customerAddressService;
+    }
+
+    public void Initialize(Users user, String currency, Long amount, String locale) {
         this.user = user;
         this.currency = currency;
         this.amount = amount;
+        this.locale = locale;
     }
 
     public Customer createCustomer(Users _user) throws Exception {
-        CustomerCreateParams customerCreateParams = new CustomerCreateParams.Builder()
+        CustomerPurchase customerPurchase = customerPurchaseService.getCustomerPurchase(_user.getUserID());
+        CustomerAddress customerAddress = customerAddressService.getCustomerAddress(_user.getUserID());
+        if(customerPurchase != null && customerPurchase.getStripeId() != null) {
+            return Customer.retrieve(customerPurchase.getStripeId());
+        }
+        CustomerCreateParams.Builder builder = new CustomerCreateParams.Builder()
                 .setEmail(_user.getEmail())
                 .setName(_user.getFullName())
                 .setPhone(_user.getMobile())
-                .build();
-        return Customer.create(customerCreateParams);
+                .addPreferredLocale(locale);
+        if(customerAddress != null) {
+            builder.setAddress(CustomerCreateParams.Address.builder()
+                    .setCity(customerAddress.getCity())
+                    .setCountry(customerAddress.getCountry())
+                    .setLine1(customerAddress.getLine1())
+                    .setLine2(customerAddress.getLine2())
+                    .setPostalCode(customerAddress.getPostalCode())
+                    .setState(customerAddress.getState())
+                    .build());
+        }
+        CustomerCreateParams customerCreateParams = builder.build();
+        Customer customer = Customer.create(customerCreateParams);
+        customerPurchaseService.saveCustomerPurchase(new CustomerPurchase(_user.getUserID(),
+                currency, locale, customerAddress!= null ? customerAddress.getAddressId() : null, customer.getId()));
+        return customer;
     }
 
     public EphemeralKey createEphemeralKey(Customer customer) throws Exception {
