@@ -5,10 +5,13 @@ public class PurchaseIntent {
     private String currency;
     private Long amount;
 
-    public PurchaseIntent(String email, String fullName, String phoneNumber, String currency, Long amount) {
+    private String locale;
+
+    public PurchaseIntent(String email, String fullName, String phoneNumber, String currency, Long amount, String locale) {
         this.email = email;
         this.currency = currency;
         this.amount = amount;
+        this.locale = locale;
     }
 
     public String getEmail() {
@@ -35,12 +38,21 @@ public class PurchaseIntent {
         this.amount = amount;
     }
 
+    public String getLocale() {
+        return locale;
+    }
+
+    public void setLocale(String locale) {
+        this.locale = locale;
+    }
+
     @Override
     public String toString() {
         return "PurchaseIntent{" +
                 "email='" + email + '\'' +
                 ", currency='" + currency + '\'' +
                 ", amount=" + amount +
+                ", locale='" + locale + '\'' +
                 '}';
     }
 }
