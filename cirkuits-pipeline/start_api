@@ -1,0 +1,7 @@
+#!/bin/bash
+cd "$HOME"
+docker stop cirkuits-api-cirkuits-api-1
+docker container rm cirkuits-api-cirkuits-api-1
+docker image rm cirkuits-api-cirkuits-api
+cd "$HOME"/cirkuits-api/
+docker compose up -d

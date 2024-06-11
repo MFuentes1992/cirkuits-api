@@ -1,0 +1,11 @@
+#!/bin/bash
+cd "$HOME"/Development/BackEnd/cirkuits-api/
+git checkout master
+git pull origin master
+export CIRKUITS_API_DB=jdbc:postgresql://localhost:5432/cirkuits_open 
+export CIRKUITS_API_PORT=80
+export CIRKUITS_JWKS_URI=https://dev-lv2cgjrb5lwe78h2.us.auth0.com
+export CIRKUITS_STRIPE_SECRET_KEY=sk_test_51HTgMwHZLa5RkL3dWhGh7hXaAPV61rP2GdxT2xigI4sMEOR94B2DNYmMY30LCpOgCtC7l5gEmvVUeyYqreqnRftA00p1FraSUn
+mvn package
+scp -i "$HOME"/Development/BackEnd/cirkuits-api/cirkuits-pipeline/cirkuits_pem.pem  "$HOME"/Development/BackEnd/cirkuits-api/target/cirkuits-api-0.0.1-SNAPSHOT.jar ec2-user@18.118.23.50:cirkuits-api/cirkuits-api-0.0.1-SNAPSHOT.jar
+
