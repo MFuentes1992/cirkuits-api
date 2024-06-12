@@ -4,17 +4,22 @@ import com.cirkuits.cirkuitsapi.address.model.CustomerAddress;
 import com.cirkuits.cirkuitsapi.address.service.CustomerAddressService;
 import com.cirkuits.cirkuitsapi.customerPurchase.model.CustomerPurchase;
 import com.cirkuits.cirkuitsapi.customerPurchase.service.CustomerPurchaseService;
+import com.cirkuits.cirkuitsapi.stripe.model.StripeBillingResponse;
 import com.cirkuits.cirkuitsapi.stripe.model.StripeResponse;
 import com.cirkuits.cirkuitsapi.user.UserService;
 import com.cirkuits.cirkuitsapi.user.Users;
 import com.stripe.model.Customer;
 import com.stripe.model.EphemeralKey;
 import com.stripe.model.PaymentIntent;
+import com.stripe.model.Subscription;
 import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.EphemeralKeyCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
+import com.stripe.param.SubscriptionCreateParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
 
 @Service
 public class StripeService {
@@ -89,6 +94,18 @@ public class StripeService {
         EphemeralKey ephemeralKey = createEphemeralKey(createCustomer(user));
         Customer customer = createCustomer(user);
         return new StripeResponse(intent.getClientSecret(), ephemeralKey.getSecret(), customer.getId());
+    }
+
+    public StripeBillingResponse createSubscriptionIntent(String priceId, String customerId) throws Exception {
+        SubscriptionCreateParams.PaymentSettings paymentSettings = SubscriptionCreateParams.PaymentSettings.builder().setSaveDefaultPaymentMethod(SubscriptionCreateParams.PaymentSettings.SaveDefaultPaymentMethod.ON_SUBSCRIPTION).build();
+        SubscriptionCreateParams createParams = SubscriptionCreateParams.builder().setCustomer(customerId).addItem(
+                SubscriptionCreateParams.Item.builder().setPrice(priceId).build()
+        ).setPaymentSettings(paymentSettings).setPaymentBehavior(SubscriptionCreateParams.PaymentBehavior.DEFAULT_INCOMPLETE)
+                .addAllExpand(Arrays.asList("latest_invoice.payment_intent"))
+                .build();
+        Subscription subscription = Subscription.create(createParams);
+        StripeBillingResponse response = new StripeBillingResponse(subscription.getId(), subscription.getLatestInvoiceObject().getPaymentIntentObject().getClientSecret());
+        return response;
     }
 
 }

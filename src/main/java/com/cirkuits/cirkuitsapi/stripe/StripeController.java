@@ -1,6 +1,8 @@
 package com.cirkuits.cirkuitsapi.stripe;
 
 import com.cirkuits.cirkuitsapi.stripe.model.PurchaseIntent;
+import com.cirkuits.cirkuitsapi.stripe.model.StripeBillingResponse;
+import com.cirkuits.cirkuitsapi.stripe.model.SubscriptionIntent;
 import com.cirkuits.cirkuitsapi.stripe.service.StripeService;
 import com.cirkuits.cirkuitsapi.user.UserService;
 import com.cirkuits.cirkuitsapi.user.Users;
@@ -30,5 +32,11 @@ public class StripeController {
         }
         stripeService.Initialize(user, pIntent.getCurrency(), pIntent.getAmount(), pIntent.getLocale());
         return ResponseEntity.ok().body(stripeService.createPaymentIntent());
+    }
+
+    @PostMapping(path = "api/v1/stripe/create-subscription")
+    public ResponseEntity<StripeBillingResponse> createSubscription(@RequestBody SubscriptionIntent sbcIntent) throws Exception {
+        Stripe.apiKey = secretKey;
+        return ResponseEntity.ok().body(stripeService.createSubscriptionIntent(sbcIntent.getPriceId(), sbcIntent.getCustomerId()));
     }
 }
