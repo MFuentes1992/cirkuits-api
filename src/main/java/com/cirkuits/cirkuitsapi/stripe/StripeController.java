@@ -1,16 +1,20 @@
 package com.cirkuits.cirkuitsapi.stripe;
 
-import com.cirkuits.cirkuitsapi.stripe.model.PurchaseIntent;
-import com.cirkuits.cirkuitsapi.stripe.model.StripeBillingResponse;
-import com.cirkuits.cirkuitsapi.stripe.model.SubscriptionIntent;
+import com.auth0.jwk.JwkException;
+import com.cirkuits.cirkuitsapi.Auth.AuthService;
+import com.cirkuits.cirkuitsapi.stripe.model.*;
+import com.cirkuits.cirkuitsapi.stripe.model.error.StripeErrorResponse;
 import com.cirkuits.cirkuitsapi.stripe.service.StripeService;
 import com.cirkuits.cirkuitsapi.user.UserService;
 import com.cirkuits.cirkuitsapi.user.Users;
+import com.stripe.model.Customer;
+import com.stripe.model.StripeError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.stripe.Stripe;
@@ -23,6 +27,9 @@ public class StripeController {
     StripeService stripeService;
     @Value("${cirkuits.stripe.secret.key}")
     private String secretKey;
+    @Value("${cirkuits.auth0.jwks.uri}")
+    private String jwkUri;
+
     @PostMapping (path = "api/v1/stripe/payment-sheet")
     public ResponseEntity<Object> paymentSheet(@RequestBody PurchaseIntent pIntent) throws Exception {
         Stripe.apiKey = secretKey;
@@ -38,5 +45,21 @@ public class StripeController {
     public ResponseEntity<StripeBillingResponse> createSubscription(@RequestBody SubscriptionIntent sbcIntent) throws Exception {
         Stripe.apiKey = secretKey;
         return ResponseEntity.ok().body(stripeService.createSubscriptionIntent(sbcIntent.getPriceId(), sbcIntent.getCustomerId()));
+    }
+
+    @PostMapping(path = "api/v1/create-customer")
+    public ResponseEntity<Object> createCustomer(@RequestHeader("Authorization") String bearerToken, @RequestBody StripeCustomer sCustomer) throws Exception {
+        AuthService authService = new AuthService(bearerToken.substring(7), jwkUri);
+        if(!authService.isValidToken() || authService.isTokenExpired()) {
+            StripeErrorResponse errorResponse = new StripeErrorResponse("Token is invalid or expired.");
+            return ResponseEntity.badRequest().body(errorResponse);
+        };
+        Stripe.apiKey = secretKey;
+        StripeCustomerResponse response = stripeService.createStripeCustomer(sCustomer.getCustomerEmail());
+        if(response == null) {
+            StripeErrorResponse errorResponse = new StripeErrorResponse("The email does not exist.");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+        return ResponseEntity.ok().body(response);
     }
 }

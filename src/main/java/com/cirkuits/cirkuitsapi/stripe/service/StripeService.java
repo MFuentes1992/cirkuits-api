@@ -5,6 +5,7 @@ import com.cirkuits.cirkuitsapi.address.service.CustomerAddressService;
 import com.cirkuits.cirkuitsapi.customerPurchase.model.CustomerPurchase;
 import com.cirkuits.cirkuitsapi.customerPurchase.service.CustomerPurchaseService;
 import com.cirkuits.cirkuitsapi.stripe.model.StripeBillingResponse;
+import com.cirkuits.cirkuitsapi.stripe.model.StripeCustomerResponse;
 import com.cirkuits.cirkuitsapi.stripe.model.StripeResponse;
 import com.cirkuits.cirkuitsapi.user.UserService;
 import com.cirkuits.cirkuitsapi.user.Users;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 @Service
 public class StripeService {
@@ -51,8 +53,8 @@ public class StripeService {
     public Customer createCustomer(Users _user) throws Exception {
         CustomerPurchase customerPurchase = customerPurchaseService.getCustomerPurchase(_user.getUserID());
         CustomerAddress customerAddress = customerAddressService.getCustomerAddress(_user.getUserID());
-        if(customerPurchase != null && customerPurchase.getStripeId() != null) {
-            return Customer.retrieve(customerPurchase.getStripeId());
+        if(customerPurchase != null && customerPurchase.getStripeCustomerId() != null) {
+            return Customer.retrieve(customerPurchase.getStripeCustomerId());
         }
         CustomerCreateParams.Builder builder = new CustomerCreateParams.Builder()
                 .setEmail(_user.getEmail())
@@ -105,6 +107,31 @@ public class StripeService {
                 .build();
         Subscription subscription = Subscription.create(createParams);
         StripeBillingResponse response = new StripeBillingResponse(subscription.getId(), subscription.getLatestInvoiceObject().getPaymentIntentObject().getClientSecret());
+        return response;
+    }
+
+    public StripeCustomerResponse createStripeCustomer(String email) throws Exception {
+        StripeCustomerResponse response = new StripeCustomerResponse();
+        Users existingUser = userService.getUserEmail(email);
+
+        if(existingUser == null) {
+            return null;
+        }
+
+        CustomerPurchase customerPurchase = customerPurchaseService.getCustomerPurchase(existingUser.getUserID());
+        if(customerPurchase != null) {
+            response.setCustomerId(customerPurchase.getStripeCustomerId());
+            response.setCustomerName(existingUser.getFullName());
+            return response;
+        }
+        CustomerCreateParams params = CustomerCreateParams.builder()
+                .setName(existingUser.getFullName())
+                .setEmail(email)
+                .build();
+        Customer customer = Customer.create(params);
+        customerPurchaseService.saveCustomerPurchase(new CustomerPurchase(existingUser.getUserID(), "", "", null, customer.getId()));
+        response.setCustomerId(customer.getId());
+        response.setCustomerName(customer.getName());
         return response;
     }
 

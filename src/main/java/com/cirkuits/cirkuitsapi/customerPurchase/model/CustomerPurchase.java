@@ -1,5 +1,6 @@
 package com.cirkuits.cirkuitsapi.customerPurchase.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -19,7 +20,7 @@ public class CustomerPurchase {
     private String locale;
     private UUID addressId;
 
-    private String stripeId;
+    private String stripeCustomerId;
 
     public CustomerPurchase() {
     }
@@ -29,7 +30,7 @@ public class CustomerPurchase {
         this.userId = userId;
         this.currency = currency;
         this.addressId = addressId;
-        this.stripeId = stripeId;
+        this.stripeCustomerId = stripeId;
         this.locale = locale;
     }
 
@@ -65,12 +66,12 @@ public class CustomerPurchase {
         this.addressId = addressId;
     }
 
-    public String getStripeId() {
-        return stripeId;
+    public String getStripeCustomerId() {
+        return stripeCustomerId;
     }
 
-    public void setStripeId(String stripeId) {
-        this.stripeId = stripeId;
+    public void setStripeCustomerId(String stripeId) {
+        this.stripeCustomerId = stripeId;
     }
 
     public String getLocale() {
@@ -88,7 +89,7 @@ public class CustomerPurchase {
                 ", userId=" + userId +
                 ", currency='" + currency + '\'' +
                 ", addressId='" + addressId + '\'' +
-                ", stripeId='" + stripeId + '\'' +
+                ", stripeId='" + stripeCustomerId + '\'' +
                 ", locale='" + locale + '\'' +
                 '}';
     }

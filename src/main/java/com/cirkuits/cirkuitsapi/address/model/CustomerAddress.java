@@ -14,7 +14,7 @@ public class CustomerAddress {
     @Id
     @UuidGenerator
     private UUID addressId;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private UUID userId;
     private String city;
     private String country;
@@ -23,6 +23,8 @@ public class CustomerAddress {
     private String line2;
     private String postalCode;
     private String state;
+
+    public CustomerAddress() {}
 
     public UUID getAddressId() {
         return addressId;

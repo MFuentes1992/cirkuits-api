@@ -28,6 +28,11 @@ public class UserService {
     public Users getUserEmail(String email) {
         return userRepo.findByEmail(email);
     }
+
+    public Users getUserById(UUID id) {
+        return userRepo.findById(id).orElse(null);
+    }
+
     public Users getLoginEmail(String email, String password) {
         Users userEmail = userRepo.findByEmail(email);
         if(userEmail != null && passwordEncoder.matches(password, userEmail.getPassword())) {
