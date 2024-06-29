@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class CustomerAddressController {
@@ -36,5 +33,20 @@ public class CustomerAddressController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("error-message", errorResponse.toString()).body(errorResponse);
         }
         return ResponseEntity.status(HttpStatus.OK).body(savedAddress);
+   }
+
+   @PutMapping("api/v1/customer-address")
+    public ResponseEntity<Object> updateCustomerAddress(@RequestHeader("Authorization") String bearerToken, @RequestBody CustomerAddress customerAddress) throws Exception {
+       AuthService authService = new AuthService(bearerToken.substring(7), jwkUri);
+       if(!authService.isValidToken() || authService.isTokenExpired()) {
+           StripeErrorResponse errorResponse = new StripeErrorResponse("Token is invalid or expired.");
+           return ResponseEntity.badRequest().body(errorResponse);
+       };
+       CustomerAddress updatedAddress = customerAddressService.updateCustomerAddress(customerAddress);
+       if(updatedAddress == null){
+           ErrorResponse errorResponse = new ErrorResponse("Server encounter an error and could not process the request.");
+           return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("error-response", errorResponse.toString()).body(errorResponse);
+       }
+       return ResponseEntity.ok().body(updatedAddress);
    }
 }

@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface CustomerAddressRepository extends JpaRepository<CustomerAddress, UUID>{
     CustomerAddress findByUserId(UUID userId);
+    CustomerAddress findByAddressId(UUID addressId);
 }

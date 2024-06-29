@@ -43,6 +43,20 @@ public class CustomerAddressService {
         return savedAddress;
     }
 
+    public CustomerAddress updateCustomerAddress(CustomerAddress customerAddress) {
+        Users existingUser = userService.getUserById(customerAddress.getUserId());
+        if (existingUser == null) {
+            return null;
+        }
+        CustomerAddress exisitingCustomerAddress = customerAddressRepository.findByUserId(existingUser.getUserID());
+        if (exisitingCustomerAddress == null) {
+            return null;
+        }
+        customerAddress.setAddressId(exisitingCustomerAddress.getAddressId());
+        CustomerAddress savedAddress = customerAddressRepository.save(customerAddress);
+        return savedAddress;
+    }
+
     public CustomerAddress getCustomerAddress(UUID userId) {
         return customerAddressRepository.findByUserId(userId);
     }
