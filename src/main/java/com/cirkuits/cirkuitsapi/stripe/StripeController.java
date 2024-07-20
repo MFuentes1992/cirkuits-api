@@ -4,6 +4,7 @@ import com.auth0.jwk.JwkException;
 import com.cirkuits.cirkuitsapi.Auth.AuthService;
 import com.cirkuits.cirkuitsapi.stripe.model.*;
 import com.cirkuits.cirkuitsapi.stripe.model.error.StripeErrorResponse;
+import com.cirkuits.cirkuitsapi.stripe.service.StripePriceService;
 import com.cirkuits.cirkuitsapi.stripe.service.StripeService;
 import com.cirkuits.cirkuitsapi.user.UserService;
 import com.cirkuits.cirkuitsapi.user.Users;
@@ -12,10 +13,8 @@ import com.stripe.model.StripeError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.annotation.*;
 
 import com.stripe.Stripe;
 
@@ -25,6 +24,8 @@ public class StripeController {
     UserService userService;
     @Autowired
     StripeService stripeService;
+    @Autowired
+    StripePriceService priceService;
     @Value("${cirkuits.stripe.secret.key}")
     private String secretKey;
     @Value("${cirkuits.auth0.jwks.uri}")
@@ -59,6 +60,21 @@ public class StripeController {
         if(response == null) {
             StripeErrorResponse errorResponse = new StripeErrorResponse("The email does not exist.");
             return ResponseEntity.badRequest().body(errorResponse);
+        }
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("api/v1/products")
+    public ResponseEntity<Object> getProducts(@RequestHeader("Authorization") String bearerToken) throws Exception {
+        AuthService authService = new AuthService(bearerToken.substring(7), jwkUri);
+        if(!authService.isValidToken() || authService.isTokenExpired()) {
+            StripeErrorResponse errorResponse = new StripeErrorResponse("Token is invalid or expired.");
+            return ResponseEntity.badRequest().body(errorResponse);
+        };
+        Stripe.apiKey = secretKey;
+        StripeProductResponse response = priceService.getProductMapper();
+        if(response == null) {
+            StripeErrorResponse errorResponse = new StripeErrorResponse("Couldn't get product list.");
         }
         return ResponseEntity.ok().body(response);
     }
