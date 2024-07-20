@@ -1,6 +1,5 @@
 package com.cirkuits.cirkuitsapi.customerPurchase.model;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -21,16 +20,18 @@ public class CustomerPurchase {
     private UUID addressId;
 
     private String stripeCustomerId;
+    private String stripeSubscriptionId;
 
     public CustomerPurchase() {
     }
 
-    public CustomerPurchase(UUID userId, String currency, String locale, UUID addressId, String stripeId) {
+    public CustomerPurchase(UUID userId, String currency, String locale, UUID addressId, String stripeId, String currentSubscriptionId) {
         this.purchaseId = UUID.randomUUID();
         this.userId = userId;
         this.currency = currency;
         this.addressId = addressId;
         this.stripeCustomerId = stripeId;
+        this.stripeSubscriptionId = currentSubscriptionId;
         this.locale = locale;
     }
 
@@ -82,6 +83,14 @@ public class CustomerPurchase {
         this.locale = locale;
     }
 
+    public String getCurrentSubscription() {
+        return stripeSubscriptionId;
+    }
+
+    public void setCurrentSubscription(String currentSubscription) {
+        this.stripeSubscriptionId = currentSubscription;
+    }
+
     @Override
     public String toString() {
         return "CustomerPurchase{" +
@@ -90,6 +99,7 @@ public class CustomerPurchase {
                 ", currency='" + currency + '\'' +
                 ", addressId='" + addressId + '\'' +
                 ", stripeId='" + stripeCustomerId + '\'' +
+                ", currentSubscription='" + stripeSubscriptionId + '\'' +
                 ", locale='" + locale + '\'' +
                 '}';
     }

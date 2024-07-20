@@ -31,4 +31,8 @@ public class CustomerPurchaseService {
     public void updateCustomerPurchase(CustomerPurchase customerPurchase) {
         customerPurchaseRepository.save(customerPurchase);
     }
+
+    public CustomerPurchase getCustomerPurchaseByStripeId(String stripeId) {
+        return customerPurchaseRepository.findCustomerPurchaseByStripeCustomerId(stripeId);
+    }
 }

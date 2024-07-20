@@ -74,7 +74,7 @@ public class StripeService {
         CustomerCreateParams customerCreateParams = builder.build();
         Customer customer = Customer.create(customerCreateParams);
         customerPurchaseService.saveCustomerPurchase(new CustomerPurchase(_user.getUserID(),
-                currency, locale, customerAddress!= null ? customerAddress.getAddressId() : null, customer.getId()));
+                currency, locale, customerAddress!= null ? customerAddress.getAddressId() : null, customer.getId(), ""));
         return customer;
     }
 
@@ -99,6 +99,14 @@ public class StripeService {
     }
 
     public StripeBillingResponse createSubscriptionIntent(String priceId, String customerId) throws Exception {
+        CustomerPurchase customerPurchase = customerPurchaseService.getCustomerPurchaseByStripeId(customerId);
+
+        // -- If subscription already exists, then return existing id.
+        if(customerPurchase != null && !customerPurchase.getCurrentSubscription().equals("")) {
+            StripeBillingResponse response = new StripeBillingResponse(customerPurchase.getCurrentSubscription(), "");
+            return response;
+        }
+
         SubscriptionCreateParams.PaymentSettings paymentSettings = SubscriptionCreateParams.PaymentSettings.builder().setSaveDefaultPaymentMethod(SubscriptionCreateParams.PaymentSettings.SaveDefaultPaymentMethod.ON_SUBSCRIPTION).build();
         SubscriptionCreateParams createParams = SubscriptionCreateParams.builder().setCustomer(customerId).addItem(
                 SubscriptionCreateParams.Item.builder().setPrice(priceId).build()
@@ -106,6 +114,13 @@ public class StripeService {
                 .addAllExpand(Arrays.asList("latest_invoice.payment_intent"))
                 .build();
         Subscription subscription = Subscription.create(createParams);
+
+        // -- If new subscription
+        if(customerPurchase != null) {
+            customerPurchase.setCurrentSubscription(subscription.getId());
+            customerPurchaseService.saveCustomerPurchase(customerPurchase);
+        }
+
         StripeBillingResponse response = new StripeBillingResponse(subscription.getId(), subscription.getLatestInvoiceObject().getPaymentIntentObject().getClientSecret());
         return response;
     }
@@ -129,7 +144,7 @@ public class StripeService {
                 .setEmail(email)
                 .build();
         Customer customer = Customer.create(params);
-        customerPurchaseService.saveCustomerPurchase(new CustomerPurchase(existingUser.getUserID(), "", "", null, customer.getId()));
+        customerPurchaseService.saveCustomerPurchase(new CustomerPurchase(existingUser.getUserID(), "", "", null, customer.getId(), ""));
         response.setCustomerId(customer.getId());
         response.setCustomerName(customer.getName());
         return response;
