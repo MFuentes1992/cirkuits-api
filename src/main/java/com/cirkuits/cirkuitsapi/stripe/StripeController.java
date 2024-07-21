@@ -78,4 +78,19 @@ public class StripeController {
         }
         return ResponseEntity.ok().body(response);
     }
+
+    @GetMapping("api/v1/{subscriptionId}/subscription")
+    public ResponseEntity<Object> getSubscription(@PathVariable("subscriptionId") String subscriptionId, @RequestHeader("Authorization") String bearerToken) throws Exception {
+        AuthService authService = new AuthService(bearerToken.substring(7), jwkUri);
+        if(!authService.isValidToken() || authService.isTokenExpired()) {
+            StripeErrorResponse errorResponse = new StripeErrorResponse("Token is invalid or expired.");
+            return ResponseEntity.badRequest().body(errorResponse);
+        };
+        Stripe.apiKey = secretKey;
+        StripeSubscriptionResponse response = stripeService.getSubscriptionById(subscriptionId);
+        if(response == null) {
+            StripeErrorResponse errorResponse = new StripeErrorResponse("Subscription not found.");
+        }
+        return ResponseEntity.ok().body(response);
+    }
 }

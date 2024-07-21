@@ -4,11 +4,11 @@ import com.cirkuits.cirkuitsapi.address.model.CustomerAddress;
 import com.cirkuits.cirkuitsapi.address.service.CustomerAddressService;
 import com.cirkuits.cirkuitsapi.customerPurchase.model.CustomerPurchase;
 import com.cirkuits.cirkuitsapi.customerPurchase.service.CustomerPurchaseService;
-import com.cirkuits.cirkuitsapi.stripe.model.StripeBillingResponse;
-import com.cirkuits.cirkuitsapi.stripe.model.StripeCustomerResponse;
-import com.cirkuits.cirkuitsapi.stripe.model.StripeResponse;
+import com.cirkuits.cirkuitsapi.stripe.model.*;
+import com.cirkuits.cirkuitsapi.stripe.model.cancelation.CancelationModel;
 import com.cirkuits.cirkuitsapi.user.UserService;
 import com.cirkuits.cirkuitsapi.user.Users;
+import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.EphemeralKey;
 import com.stripe.model.PaymentIntent;
@@ -147,6 +147,43 @@ public class StripeService {
         customerPurchaseService.saveCustomerPurchase(new CustomerPurchase(existingUser.getUserID(), "", "", null, customer.getId(), ""));
         response.setCustomerId(customer.getId());
         response.setCustomerName(customer.getName());
+        return response;
+    }
+
+    public StripeSubscriptionResponse getSubscriptionById(String id) throws StripeException {
+        Subscription sub = Subscription.retrieve(id);
+        StripeSubscriptionMapper subscriptionMapper = new StripeSubscriptionMapper();
+
+        CustomerPurchase customerPurchase = customerPurchaseService.getCustomerPurchaseBySubscriptionId(id);
+        if(customerPurchase == null) {
+            return null;
+        }
+
+        subscriptionMapper.setUserId(customerPurchase.getUserId().toString());
+        subscriptionMapper.setCustomerId(customerPurchase.getStripeCustomerId());
+        subscriptionMapper.setSubscriptionId(sub.getId());
+        subscriptionMapper.setStatus(sub.getStatus());
+        subscriptionMapper.setPeriodStart(sub.getCurrentPeriodStart());
+        subscriptionMapper.setPeriodEnd(sub.getCurrentPeriodEnd());
+        if(sub.getCancelAt() != null && sub.getCanceledAt() != null && sub.getDaysUntilDue() != null) {
+            subscriptionMapper.setCancelAt(sub.getCancelAt());
+            subscriptionMapper.setCanceledAt(sub.getCanceledAt());
+            subscriptionMapper.setDaysUntilDue(sub.getDaysUntilDue());
+        }
+
+
+        CancelationModel cancel = new CancelationModel();
+        Subscription.CancellationDetails cancelDetails = sub.getCancellationDetails();
+        if(cancelDetails != null && cancelDetails.getReason() != null && cancelDetails.getComment() != null && cancelDetails.getFeedback() != null ) {
+            cancel.setReason(sub.getCancellationDetails().getReason());
+            cancel.setFeedback(sub.getCancellationDetails().getFeedback());
+            cancel.setComment(sub.getCancellationDetails().getComment());
+
+            subscriptionMapper.setCancelationDetails(cancel);
+        }
+
+        StripeSubscriptionResponse response = new StripeSubscriptionResponse();
+        response.setSubscription(subscriptionMapper);
         return response;
     }
 

@@ -12,4 +12,7 @@ public interface CustomerPurchaseRepository extends JpaRepository<CustomerPurcha
     CustomerPurchase findByAddressId(UUID addressId);
     @Query(value = "SELECT * FROM tbl_customer_purchase WHERE stripe_customer_id = ?1", nativeQuery = true)
     CustomerPurchase findCustomerPurchaseByStripeCustomerId(String stripeCustomerId);
+
+    @Query(value = "SELECT * FROM tbl_customer_purchase WHERE stripe_subscription_id = ?1", nativeQuery = true)
+    CustomerPurchase findCustomerPurchaseBySubscriptionId(String id);
 }

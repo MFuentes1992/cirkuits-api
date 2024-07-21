@@ -35,4 +35,8 @@ public class CustomerPurchaseService {
     public CustomerPurchase getCustomerPurchaseByStripeId(String stripeId) {
         return customerPurchaseRepository.findCustomerPurchaseByStripeCustomerId(stripeId);
     }
+
+    public CustomerPurchase getCustomerPurchaseBySubscriptionId(String subscriptionId) {
+        return customerPurchaseRepository.findCustomerPurchaseBySubscriptionId(subscriptionId);
+    }
 }
