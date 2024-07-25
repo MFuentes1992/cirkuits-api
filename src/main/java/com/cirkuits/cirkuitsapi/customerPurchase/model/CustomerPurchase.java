@@ -19,17 +19,19 @@ public class CustomerPurchase {
     private String locale;
     private UUID addressId;
 
-    private String stripeId;
+    private String stripeCustomerId;
+    private String stripeSubscriptionId;
 
     public CustomerPurchase() {
     }
 
-    public CustomerPurchase(UUID userId, String currency, String locale, UUID addressId, String stripeId) {
+    public CustomerPurchase(UUID userId, String currency, String locale, UUID addressId, String stripeId, String currentSubscriptionId) {
         this.purchaseId = UUID.randomUUID();
         this.userId = userId;
         this.currency = currency;
         this.addressId = addressId;
-        this.stripeId = stripeId;
+        this.stripeCustomerId = stripeId;
+        this.stripeSubscriptionId = currentSubscriptionId;
         this.locale = locale;
     }
 
@@ -65,12 +67,12 @@ public class CustomerPurchase {
         this.addressId = addressId;
     }
 
-    public String getStripeId() {
-        return stripeId;
+    public String getStripeCustomerId() {
+        return stripeCustomerId;
     }
 
-    public void setStripeId(String stripeId) {
-        this.stripeId = stripeId;
+    public void setStripeCustomerId(String stripeId) {
+        this.stripeCustomerId = stripeId;
     }
 
     public String getLocale() {
@@ -81,6 +83,14 @@ public class CustomerPurchase {
         this.locale = locale;
     }
 
+    public String getCurrentSubscription() {
+        return stripeSubscriptionId;
+    }
+
+    public void setCurrentSubscription(String currentSubscription) {
+        this.stripeSubscriptionId = currentSubscription;
+    }
+
     @Override
     public String toString() {
         return "CustomerPurchase{" +
@@ -88,7 +98,8 @@ public class CustomerPurchase {
                 ", userId=" + userId +
                 ", currency='" + currency + '\'' +
                 ", addressId='" + addressId + '\'' +
-                ", stripeId='" + stripeId + '\'' +
+                ", stripeId='" + stripeCustomerId + '\'' +
+                ", currentSubscription='" + stripeSubscriptionId + '\'' +
                 ", locale='" + locale + '\'' +
                 '}';
     }

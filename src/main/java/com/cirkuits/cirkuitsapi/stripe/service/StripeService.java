@@ -4,17 +4,24 @@ import com.cirkuits.cirkuitsapi.address.model.CustomerAddress;
 import com.cirkuits.cirkuitsapi.address.service.CustomerAddressService;
 import com.cirkuits.cirkuitsapi.customerPurchase.model.CustomerPurchase;
 import com.cirkuits.cirkuitsapi.customerPurchase.service.CustomerPurchaseService;
-import com.cirkuits.cirkuitsapi.stripe.model.StripeResponse;
+import com.cirkuits.cirkuitsapi.stripe.model.*;
+import com.cirkuits.cirkuitsapi.stripe.model.cancelation.CancelationModel;
 import com.cirkuits.cirkuitsapi.user.UserService;
 import com.cirkuits.cirkuitsapi.user.Users;
+import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.EphemeralKey;
 import com.stripe.model.PaymentIntent;
+import com.stripe.model.Subscription;
 import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.EphemeralKeyCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
+import com.stripe.param.SubscriptionCreateParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.UUID;
 
 @Service
 public class StripeService {
@@ -46,8 +53,8 @@ public class StripeService {
     public Customer createCustomer(Users _user) throws Exception {
         CustomerPurchase customerPurchase = customerPurchaseService.getCustomerPurchase(_user.getUserID());
         CustomerAddress customerAddress = customerAddressService.getCustomerAddress(_user.getUserID());
-        if(customerPurchase != null && customerPurchase.getStripeId() != null) {
-            return Customer.retrieve(customerPurchase.getStripeId());
+        if(customerPurchase != null && customerPurchase.getStripeCustomerId() != null) {
+            return Customer.retrieve(customerPurchase.getStripeCustomerId());
         }
         CustomerCreateParams.Builder builder = new CustomerCreateParams.Builder()
                 .setEmail(_user.getEmail())
@@ -67,7 +74,7 @@ public class StripeService {
         CustomerCreateParams customerCreateParams = builder.build();
         Customer customer = Customer.create(customerCreateParams);
         customerPurchaseService.saveCustomerPurchase(new CustomerPurchase(_user.getUserID(),
-                currency, locale, customerAddress!= null ? customerAddress.getAddressId() : null, customer.getId()));
+                currency, locale, customerAddress!= null ? customerAddress.getAddressId() : null, customer.getId(), ""));
         return customer;
     }
 
@@ -89,6 +96,95 @@ public class StripeService {
         EphemeralKey ephemeralKey = createEphemeralKey(createCustomer(user));
         Customer customer = createCustomer(user);
         return new StripeResponse(intent.getClientSecret(), ephemeralKey.getSecret(), customer.getId());
+    }
+
+    public StripeBillingResponse createSubscriptionIntent(String priceId, String customerId) throws Exception {
+        CustomerPurchase customerPurchase = customerPurchaseService.getCustomerPurchaseByStripeId(customerId);
+
+        // -- If subscription already exists, then return existing id.
+        if(customerPurchase != null && !customerPurchase.getCurrentSubscription().equals("")) {
+            StripeBillingResponse response = new StripeBillingResponse(customerPurchase.getCurrentSubscription(), "");
+            return response;
+        }
+
+        SubscriptionCreateParams.PaymentSettings paymentSettings = SubscriptionCreateParams.PaymentSettings.builder().setSaveDefaultPaymentMethod(SubscriptionCreateParams.PaymentSettings.SaveDefaultPaymentMethod.ON_SUBSCRIPTION).build();
+        SubscriptionCreateParams createParams = SubscriptionCreateParams.builder().setCustomer(customerId).addItem(
+                SubscriptionCreateParams.Item.builder().setPrice(priceId).build()
+        ).setPaymentSettings(paymentSettings).setPaymentBehavior(SubscriptionCreateParams.PaymentBehavior.DEFAULT_INCOMPLETE)
+                .addAllExpand(Arrays.asList("latest_invoice.payment_intent"))
+                .build();
+        Subscription subscription = Subscription.create(createParams);
+
+        // -- If new subscription
+        if(customerPurchase != null) {
+            customerPurchase.setCurrentSubscription(subscription.getId());
+            customerPurchaseService.saveCustomerPurchase(customerPurchase);
+        }
+
+        StripeBillingResponse response = new StripeBillingResponse(subscription.getId(), subscription.getLatestInvoiceObject().getPaymentIntentObject().getClientSecret());
+        return response;
+    }
+
+    public StripeCustomerResponse createStripeCustomer(String email) throws Exception {
+        StripeCustomerResponse response = new StripeCustomerResponse();
+        Users existingUser = userService.getUserEmail(email);
+
+        if(existingUser == null) {
+            return null;
+        }
+
+        CustomerPurchase customerPurchase = customerPurchaseService.getCustomerPurchase(existingUser.getUserID());
+        if(customerPurchase != null) {
+            response.setCustomerId(customerPurchase.getStripeCustomerId());
+            response.setCustomerName(existingUser.getFullName());
+            return response;
+        }
+        CustomerCreateParams params = CustomerCreateParams.builder()
+                .setName(existingUser.getFullName())
+                .setEmail(email)
+                .build();
+        Customer customer = Customer.create(params);
+        customerPurchaseService.saveCustomerPurchase(new CustomerPurchase(existingUser.getUserID(), "", "", null, customer.getId(), ""));
+        response.setCustomerId(customer.getId());
+        response.setCustomerName(customer.getName());
+        return response;
+    }
+
+    public StripeSubscriptionResponse getSubscriptionById(String id) throws StripeException {
+        Subscription sub = Subscription.retrieve(id);
+        StripeSubscriptionMapper subscriptionMapper = new StripeSubscriptionMapper();
+
+        CustomerPurchase customerPurchase = customerPurchaseService.getCustomerPurchaseBySubscriptionId(id);
+        if(customerPurchase == null) {
+            return null;
+        }
+
+        subscriptionMapper.setUserId(customerPurchase.getUserId().toString());
+        subscriptionMapper.setCustomerId(customerPurchase.getStripeCustomerId());
+        subscriptionMapper.setSubscriptionId(sub.getId());
+        subscriptionMapper.setStatus(sub.getStatus());
+        subscriptionMapper.setPeriodStart(sub.getCurrentPeriodStart());
+        subscriptionMapper.setPeriodEnd(sub.getCurrentPeriodEnd());
+        if(sub.getCancelAt() != null && sub.getCanceledAt() != null && sub.getDaysUntilDue() != null) {
+            subscriptionMapper.setCancelAt(sub.getCancelAt());
+            subscriptionMapper.setCanceledAt(sub.getCanceledAt());
+            subscriptionMapper.setDaysUntilDue(sub.getDaysUntilDue());
+        }
+
+
+        CancelationModel cancel = new CancelationModel();
+        Subscription.CancellationDetails cancelDetails = sub.getCancellationDetails();
+        if(cancelDetails != null && cancelDetails.getReason() != null && cancelDetails.getComment() != null && cancelDetails.getFeedback() != null ) {
+            cancel.setReason(sub.getCancellationDetails().getReason());
+            cancel.setFeedback(sub.getCancellationDetails().getFeedback());
+            cancel.setComment(sub.getCancellationDetails().getComment());
+
+            subscriptionMapper.setCancelationDetails(cancel);
+        }
+
+        StripeSubscriptionResponse response = new StripeSubscriptionResponse();
+        response.setSubscription(subscriptionMapper);
+        return response;
     }
 
 }
