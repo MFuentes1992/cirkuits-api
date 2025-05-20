@@ -8,74 +8,48 @@ CREATE DATABASE cirkuits_open
     TABLESPACE = pg_default
     CONNECTION LIMIT = -1
     IS_TEMPLATE = False;
+
+# -------------------- UserStatus
+1) Pending
+2) Active
+3) Inactive
+4) Deleted
+CREATE TABLE IF NOT EXISTS public."tbl_UserStatus"
+(
+    "status_id" integer NOT NULL,
+    "status_name" text NOT NULL,
+    "create_date" timestamp without time zone NOT NULL,
+    "update_date" timestamp without time zone NOT NULL,
+    CONSTRAINT userstatus_pkey PRIMARY KEY ("status_id")
+);
+
+INSERT INTO public."tbl_UserStatus" ("status_id", "status_name", "create_date", "update_date")
+VALUES
+    (1, "Pending", now(), now()),
+    (2, "Active", now(), now()),
+    (3, "Inactive", now(), now()),
+    (4, "Deleted", now(), now());
+-- -------------------- UserRoles
+
 # -------------------- Users
 CREATE TABLE IF NOT EXISTS public."tbl_Users"
 (
-    "UserID" "char"[] NOT NULL,
-    "FullName" text COLLATE pg_catalog."default" NOT NULL,
-    "UserName" "char"[] NOT NULL,
-    "Email" "char"[] NOT NULL,
-    "Mobile" "char"[] NOT NULL,
-    "Password" text COLLATE pg_catalog."default" NOT NULL,
-    "Active" boolean NOT NULL DEFAULT false,
-    CONSTRAINT users_pkey PRIMARY KEY ("UserID")
-)
+    "user_id" text NOT NULL,
+    "first_name" text NOT NULL,
+    "last_name" text NOT NULL,
+    "email" text NOT NULL,
+    "user_name" text NOT NULL,
+    "password" text NOT NULL,
+    "dob" date NOT NULL,
+    "status_id" integer NOT NULL,
+    "create_date" timestamp without time zone NOT NULL,
+    "update_date" timestamp without time zone NOT NULL,
+    CONSTRAINT users_pkey PRIMARY KEY ("user_id"),
+    CONSTRAINT users_status_id_fkey FOREIGN KEY ("status_id")
+        REFERENCES public."tbl_UserStatus" ("status_id") MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT DEFERRABLE
+);
 
-TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS public."tbl_Users"
-    OWNER to nico;
-# -------------------------- Subscription
-CREATE TABLE IF NOT EXISTS public."tbl_Subscription"
-(
-    "SubID" "char"[] NOT NULL,
-    "StartDate" date NOT NULL,
-    "EndDate" date NOT NULL,
-    "Active" boolean NOT NULL,
-    "UserID" "char"[] NOT NULL,
-    CONSTRAINT "tbl_Subscription_pkey" PRIMARY KEY ("SubID")
-)
-
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public."tbl_Subscription"
-    OWNER to nico;
-
-# -------------------------- Address
-CREATE TABLE IF NOT EXISTS public."tbl_UserAddress"
-(
-    "AddressID" "char"[] NOT NULL,
-    "Street" "char"[] NOT NULL,
-    "City" "char"[] NOT NULL,
-    "Country" "char"[] NOT NULL,
-    "State_Providence" "char"[] NOT NULL,
-    "PostalCode" "char"[] NOT NULL,
-    "UserID" "char"[] NOT NULL,
-    "Active" boolean NOT NULL DEFAULT false,
-    CONSTRAINT "tbl_AddressID_pkey" PRIMARY KEY ("AddressID")
-)
-
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public."tbl_UserAddress"
-    OWNER to nico;
-
-# -------------------------- Payment method
-CREATE TABLE IF NOT EXISTS public."tbl_PaymentMethod"
-(
-    "PaymentID" "char"[] NOT NULL,
-    "CardHolderName" "char"[] NOT NULL,
-    "CardHolderLastName" "char"[] NOT NULL,
-    "CardNumber" "char"[] NOT NULL,
-    "CVV" "char"[] NOT NULL,
-    "ExpYear" integer NOT NULL DEFAULT 1999,
-    "ExpMonth" integer NOT NULL DEFAULT 12,
-    "UserID" "char"[] NOT NULL,
-    "AddressID" "char"[] NOT NULL,
-    CONSTRAINT "tbl_PaymentMethod_pkey" PRIMARY KEY ("PaymentID")
-)
-
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public."tbl_PaymentMethod"
-    OWNER to nico;
